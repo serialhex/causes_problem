@@ -1,0 +1,3 @@
+# ignore compiled *.8 & *.rbc files...
+*.8
+*.rbc

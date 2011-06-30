@@ -1,0 +1,59 @@
+<serialhex> cmike_: i'm mostly working on learning go :P but as far as a "real" project i'm doing this (look at the challenge at the bottom) : http://jobs.github.com/positions/181fb26e-71cc-11e0-96a9-8752f87b91a0
+<serialhex> maybe i can impress them with my ~n00b skillz and get a job to pay for college :P
+<-- sniper506th (~sniper506@rrcs-70-61-192-18.midsouth.biz.rr.com) has quit (Quit: Leaving...)
+<-- ShadowIce (~pyoro@unaffiliated/shadowice-x841044) has quit (Quit: Verlassend)
+<serialhex> or maybe i have n00b++ skillz by now :P
+<cmike_> nice problem solving example
+<-- ampleyfly (ampleyfly@gateway/shell/blinkenshell.org/x-yahjkozdmbjmyyzd) has quit (Ping timeout: 258 seconds)
+<cmike_> they give you the code on the wiki
+<serialhex> yeah, i was tryingit in ruby, but getting the distances of the dict from 'causes' was taking FOREVER!!!
+<cmike_> can you filter out the words that won't have the correct length first?
+--> moraes (~moraes@189.103.188.201) has joined #go-nuts
+<serialhex> they give you the code, but then you need to find the friends of the friends, and friends of friends of friends... and so on
+--> ampleyfly (ampleyfly@gateway/shell/blinkenshell.org/x-lgswimayhnjhowcv) has joined #go-nuts
+-*- kergoth__ adds that one to his slowly growing list of exercises/challenges/etc
+<-> kergoth__ is now known as kergoth`
+<serialhex> probably... take all words that are +-1 letter
+<cmike_> you just store the friends, then do the same thing to them
+<serialhex> next i'll probably do some of the euler project things in go...
+<cmike_> keep looping, just fire up some instances on ec2 to put that to work
+<serialhex> on ec2??
+<cmike_> amazon ec2
+<serialhex> oh, i see... i didn't thinkof that :D
+<serialhex> my computer being slow is probably a big reason it was taking so long
+<cmike_> ya,
+<cmike_> then just have another process for each friend
+<serialhex> i would have chunked it into threads and workd on it that way, but, at their heart,. P4's are single-core
+<cmike_> use the Go controller and worker example to serve our jobs
+<serialhex> and thus, single thread
+<cmike_> server out*
+<cmike_> have the controller hold the list of friends, then when the workers are done looping, they give back friends that they found, and add those to the controller's list
+<serialhex> ...as anyone else seen google's spiffy new ui??
+<KirkMcDonald> Google?
+<serialhex> hmm... that sounds interesting
+<exch> google has a knack for fixing what isn't broken
+<serialhex> yeah, google.com & the searches look different for me now, not bad, just new
+<KirkMcDonald> Tell us more of this "the Google."
+<|Craig|> serialhex: get all the friend relations into a queue or some sort, and use an upTree find all the disconnected parts of the graph. Then scan for the one containing the work or interest.
+<serialhex> upTree |Craig|??
+<serialhex> KirkMcDonald: ask The Great Google any Q, and it shall be answered (answered correctly is a different story, but answered it shall be!)
+<|Craig|> serialhex: its a trivial data structure that does unions and finds with sets. look it up, its almost linear time ;)
+--> tgall_foo (~tgall@206.9.88.154) has joined #go-nuts
+<serialhex> hmm, i'll see what i can find, thanks |Craig|!!
+<|Craig|> upTrees are not used very often, but when you need one (usally for kruskal's algorithm) they are great.
+<cmike_> serialhex: you make the loop that goes though the wordlist and finds friends for X word, then I will make you a queue and controller to dish out more X for the the loop again
+<cmike_> be our Go learning exercise for both of us
+<serialhex> you got a github acct cmike_??
+<cmike_> ya, what is your username
+<serialhex> i'll give you 3 guesses, the first 2 dont count :P
+<|Craig|> serialhex: my up tree based approach has the issue that it divides the entire word list into the separate friend networks, not just the one you need, which prabably wasts most of the time, but is interesting
+<serialhex> |Craig|: well getting in and writing some cool algos in go is probably better than simply trying to find the quickest route when trying to learn
+-*- serialhex can't find uptrees on wikipedia... needs another resource
+<|Craig|> an optimized upTree in java is 2 methods, a total of like 6-8 lines.
+<-- vinisterx (~ryan@74-129-201-27.dhcp.insightbb.com) has quit (Ping timeout: 240 seconds)
+<cmike_> sent you a msg on github serialhex
+<cmike_> bbl
+<-- cmike_ (~mcrosby@c-71-57-13-183.hsd1.il.comcast.net) has quit (Quit: cmike_)
+<serialhex> yeah, i just can't find a description or implementation yet... too many damn plants in my way!!!
+<|Craig|> serialhex: look up kruskal's algorithm, its the only common use of upTrees
+<serialhex> ahh, got it, thanks!!
