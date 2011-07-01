@@ -33,44 +33,11 @@
 package main
 
 import (
-	//"./file"
+	"./editdist"
 	"fmt"
 	"bufio"
 	"os"
 )
-
-// putting it here for now cause i'm lazy and want to compile less things...
-func editDist(a, b string) (min int) {
-	switch {
-		case len(a) == 0: 
-			min = len(b)
-		case len(b) == 0:
-			min = len(a)
-		default:
-			var i, j, k int
-			// setting i
-			if a[0] == b[0] {
-				i = editDist(a[1:], b[1:])
-			} else {
-				i = 1 + editDist(a[1:], b[1:])
-			}
-			// setting j
-			j = 1 + editDist(a[1:], b)
-			// setting k
-			k = 1 + editDist(a, b[1:])
-			
-			// return the min
-			if i < j {
-				min  = i
-			} else {
-				min = j
-			}
-			if k < min {
-				min = k
-			} 
-	}
-	return
-}
 
 // will initialize dict here...
 func loadDict(fname string) ([]string, os.Error) {
@@ -96,18 +63,18 @@ func loadDict(fname string) ([]string, os.Error) {
 
 func main() {
 
-	dict, err := loadDict("word.smal")
+	dict, err := loadDict("test")
 	if err != nil { 
 		fmt.Print(err)
 		os.Exit(1)
 	}
-	fmt.Print("printing dict", dict)
 
-	/* temporarily...
+	fmt.Print(true)
+	fmt.Print(false)
+
 	for i := 0; i < len(dict); i++ {
 		for j := i+1; j < len(dict); j++ {
-			fmt.Print(dict[i], ", ", dict[j], " edit distance: ", editDist(dict[i], dict[j]), "\n")
+			fmt.Print(dict[i], ", ", dict[j], " friends? ", editdist.Friend(dict[i], dict[j]), "\n")
 		}
 	}
-	*/
 }

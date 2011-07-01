@@ -4,15 +4,13 @@
 
 package editdist
 
-func EditDist(a, b string) int {
+func EditDist(a, b string) (min int) {
 	switch {
-		case len(a) == 0 {
+		case len(a) == 0:
 			return len(b)
-		}
-		case len(b) == 0 {
+		case len(b) == 0:
 			return len(a)
-		}
-		default {
+		default:
 			var i, j, k int
 			// setting i
 			if a[0] == b[0] {
@@ -33,15 +31,31 @@ func EditDist(a, b string) int {
 				min = j
 			}
 			if k < min {
-				return k
-			} else {
-				return min
+				min = k
 			}
-		}
 	}
+	return
 }
 
-func Friend(a, b string) bool {
+
+func Friend(a, b string) (ret bool) {
+	// our default is > 1 so we dont get a false positive
+	dist := 70
 	// testing to see if len(a) +- 1 == len(b)
-	if 
+	switch {
+		case len(a) == len(b):
+			dist = EditDist(a, b)
+		case len(a)+1 == len(b):
+			dist = EditDist(a, b)
+		case len(a)-1 == len(b):
+			dist = EditDist(a, b)
+		default:
+			ret = false
+	}
+	// switchin like a transistor yo!
+	switch dist {
+		case -1, 0, 1: ret = true
+		default: ret = false
+	}
+	return
 }
