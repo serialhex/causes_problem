@@ -33,13 +33,14 @@
 package main
 
 import (
-	"./file"
+	//"./file"
 	"fmt"
+	"bufio"
+	"os"
 )
 
-// putting it here cause i'm lazy and want to compile less things...
-func editDist(a, b string) int {
-	min := 0
+// putting it here for now cause i'm lazy and want to compile less things...
+func editDist(a, b string) (min int) {
 	switch {
 		case len(a) == 0: 
 			min = len(b)
@@ -66,29 +67,41 @@ func editDist(a, b string) int {
 			}
 			if k < min {
 				min = k
-			} else {
-				return min
-			}
+			} 
 	}
-	return min
+	return
 }
 
 // will initialize dict here...
-func loadDict(fname string) []string {
-	opn, _ := file.Open(fname)
+func loadDict(fname string) ([]string, os.Error) {
+	fmt.Print("Loading Dictionary\n")
+	opn, err := os.Open(fname)
+	if err != nil { return nil, err }
+	defer opn.Close()
 	reader := bufio.NewReader(opn)
 
-	theGuess := 100 // the file is ~ this big...
+	theGuess := 10 // the file is ~ this big...
 	dict := make([]string, 0, theGuess)
 
-	line, _, _ := reader.ReadLine()
+	// i'm probably doing something wrong here...
+	// getting the first line...
 
+	for {
+		line, _, err := reader.ReadLine()
+		dict = append(dict, string(line))
+		if err == os.EOF { break }
+	}
+	return dict, err
 }
 
 func main() {
 
-	dict := loadDict("word.small")
-	fmt.Printf(dict)
+	dict, err := loadDict("word.smal")
+	if err != nil { 
+		fmt.Print(err)
+		os.Exit(1)
+	}
+	fmt.Print("printing dict", dict)
 
 	/* temporarily...
 	for i := 0; i < len(dict); i++ {

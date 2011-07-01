@@ -4,7 +4,7 @@
 
 package editdist
 
-func EditDistance(a, b string) int {
+func EditDist(a, b string) int {
 	switch {
 		case len(a) == 0 {
 			return len(b)
@@ -16,14 +16,14 @@ func EditDistance(a, b string) int {
 			var i, j, k int
 			// setting i
 			if a[0] == b[0] {
-				i = Levenshtein(a[1:], b[1:])
+				i = EditDist(a[1:], b[1:])
 			} else {
-				i = 1 + Levenshtein(a[1:], b[1:])
+				i = 1 + EditDist(a[1:], b[1:])
 			}
 			// setting j
-			j = 1 + Levenshtein(a[1:], b)
+			j = 1 + EditDist(a[1:], b)
 			// setting k
-			j = 1 + Levenshtein(a, b[1:])
+			j = 1 + EditDist(a, b[1:])
 			
 			// return the min
 			min := 0
@@ -39,4 +39,9 @@ func EditDistance(a, b string) int {
 			}
 		}
 	}
+}
+
+func Friend(a, b string) bool {
+	// testing to see if len(a) +- 1 == len(b)
+	if 
 }
