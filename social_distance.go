@@ -69,12 +69,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Print(true)
-	fmt.Print(false)
+	var ret bool
+
+	fmt.Print("default bool value: ",ret, "\n")
 
 	for i := 0; i < len(dict); i++ {
 		for j := i+1; j < len(dict); j++ {
-			fmt.Print(dict[i], ", ", dict[j], " friends? ", editdist.Friend(dict[i], dict[j]), "\n")
+			yn, dist := editdist.Friend(dict[i], dict[j])
+			fmt.Print(dict[i], ", ", dict[j], " friends? ", yn, " ", dist, "\n")
 		}
 	}
 }
