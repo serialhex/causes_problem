@@ -55,8 +55,8 @@ func loadDict(fname string) ([]string, os.Error) {
 
 	for {
 		line, _, err := reader.ReadLine()
-		dict = append(dict, string(line))
 		if err == os.EOF { break }
+		dict = append(dict, string(line))
 	}
 	return dict, err
 }
@@ -64,7 +64,7 @@ func loadDict(fname string) ([]string, os.Error) {
 func main() {
 
 	fmt.Print("loading dict\n")
-	dict, err := loadDict("test")
+	dict, err := loadDict("word.list")
 	if err != nil { 
 		fmt.Print(err)
 		os.Exit(1)
