@@ -1,6 +1,6 @@
-// social distance in Go
+#!/usr/bin/env ruby
 
-/* social distance & thoughts
+=begin social distance & thoughts
   
   * from:
   http://jobs.github.com/positions/181fb26e-71cc-11e0-96a9-8752f87b91a0
@@ -28,54 +28,47 @@
 
   - Justin Patera aka serialhex
 
-*/
+=end
 
-package main
+require './levenshtein'
+require 'yaml'
 
-import (
-	"./editdist"
-	"fmt"
-	"bufio"
-	"os"
-)
+# throwing them in a hash which should be faster to search than an array, and i can keep track of which words point to a given word, so i dont have infinite feh => meh => feh => meh crud
+# maybe the above, i dunno... fer now an array
+puts "creating dictionary..."
+dict = []
+File.open("word.list", 'r') do |f|
+  f.each_line do |word| # because each line only has one word
+    dict << word.chomp
+  end
+end
 
-// will initialize dict here...
-func loadDict(fname string) ([]string, os.Error) {
-	fmt.Print("Loading Dictionary\n")
-	opn, err := os.Open(fname)
-	if err != nil { return nil, err }
-	defer opn.Close()
-	reader := bufio.NewReader(opn)
+# set the network to it's root: 'causes'
+# using a hash cause it should be faster than an array for searching & stuff
+network = {'causes' => {}}
 
-	theGuess := 10 // the file is ~ this big...
-	dict := make([]string, 0, theGuess)
+=begin algorithm
+  
+  so, after some refelction, i have figured that the best way to go about it is thus:
 
-	// i'm probably doing something wrong here...
-	// getting the first line...
+  1) get the Levenshtein distance of all the words in dict from 'causes'
+  2) from the words that are friends with 'causes', find their friends from all words that are twice removed from 'causes', and from those words, and the words thrice removed from causes and so on and so forth... (i know, it's meta, and you couldn't use this to do the same kind of thing for people, but i'm not using people i'm using words!)
+  3) PROFIT!
 
-	for {
-		line, _, err := reader.ReadLine()
-		dict = append(dict, string(line))
-		if err == os.EOF { break }
-	}
-	return dict, err
-}
+=end
 
-func main() {
+there = Time.now
+counter = 0
+puts 'distancifyin yo!' 
+distances = Hash.new{|hsh, key| hsh[key] = Array.new}
+distances[0] = 'causes' # 'causes' has a 0 Levenshtein distance from 'causes' :D
+dict.each do |word|
+  counter += 1
+  print '.' if (counter % 10 == 0)
+  distances[word.edit_dist 'causes'] << word
+end
 
-	fmt.Print("loading dict\n")
-	dict, err := loadDict("test")
-	if err != nil { 
-		fmt.Print(err)
-		os.Exit(1)
-	}
+puts
+puts "finished in: #{Time.now - there}"
 
-	fmt.Print("doing thingy: \n")
-
-	for i := 0; i < len(dict); i++ {
-		for j := i+1; j < len(dict); j++ {
-			dist := editdist.EditDist(dict[i], dict[j])
-			fmt.Print(dict[i], ", ", dict[j], " distance: ",  dist, "\n")
-		}
-	}
-}
+File.open('socials.yml', 'w') {|f| YAML.dump(distances, f)}
