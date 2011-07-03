@@ -26,6 +26,8 @@
   3) i can write an implementation of Levenshtein distance and then iterate through the dict looking for words where string.levenshtein_distance(str) == 1.  then iterate though *those* words and do the same and so on, and so forth...
   - this is better, though maybe i'll think of something even better!!
 
+  4) best idea yet: find a fast & efficient algo for finding the Levenshtein distance, and implement it.  then, scan through the dictionary and sort the words by length & beginning letter. finally, when actually _looking_ for the friends, only look for words that are +-1 len & begin with the same letter, or the same length (and begin with any letter) then use the algo to sort through _thoes_.  stick friends in a map & make sure to set `map[str1] << str2` && `map[str2] << str1` and check for that, because if words are friends, then they're friends right?
+
   - Justin Patera aka serialhex
 
 */
@@ -33,7 +35,8 @@
 package main
 
 import (
-	"./editdist"
+	//"./editdist"
+	"./wordsort"
 	"fmt"
 	"bufio"
 	"os"
@@ -50,9 +53,6 @@ func loadDict(fname string) ([]string, os.Error) {
 	theGuess := 10 // the file is ~ this big...
 	dict := make([]string, 0, theGuess)
 
-	// i'm probably doing something wrong here...
-	// getting the first line...
-
 	for {
 		line, _, err := reader.ReadLine()
 		if err == os.EOF { break }
@@ -61,21 +61,24 @@ func loadDict(fname string) ([]string, os.Error) {
 	return dict, err
 }
 
+
+
 func main() {
 
-	fmt.Print("loading dict\n")
-	dict, err := loadDict("word.list")
+	fmt.Println("loading dict...")
+	dict, err := loadDict("word.small")
 	if err != nil { 
 		fmt.Print(err)
 		os.Exit(1)
 	}
 
-	fmt.Print("doing thingy: \n")
+	// sorting words
+	fmt.Println("sorting words...")
+	words := wordsort.WordSort(dict)
+	
 
-	for i := 0; i < len(dict); i++ {
-		for j := i+1; j < len(dict); j++ {
-			dist := editdist.EditDist(dict[i], dict[j])
-			fmt.Print(dict[i], ", ", dict[j], " distance: ",  dist, "\n")
-		}
-	}
+
+	fmt.Println("doing thingy: ")
+
+	
 }
