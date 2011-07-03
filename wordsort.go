@@ -1,12 +1,12 @@
 package wordsort
 
 
-func WordSort(dict []string) (map[int] map[uint8] []string) {
+func WordSort(dict []string) (map[int] map[byte] []string) {
 	// maybe use nested slices instead of maps? might be faster...
-	words := make(map[int] map[uint8] []string)
+	words := make(map[int] map[byte] []string)
 	for _, str := range dict {
 		 if words[len(str)] == nil {
-		 	words[len(str)] = make(map[uint8] []string)
+		 	words[len(str)] = make(map[byte] []string)
 		 }
 		words[len(str)][str[0]] = append(words[len(str)][str[0]], str)
 	}
@@ -22,7 +22,7 @@ func SortMap(dict []string) (m map[int] map[byte] []string) {
     m = make(map[int] map[byte] []string)
     for i = range dict {
         if l = len(dict[i]); l == 0 {
-            continue
+            continue  // like next, only different spelling :P
         }
 
         if _, ok = m[l]; !ok {

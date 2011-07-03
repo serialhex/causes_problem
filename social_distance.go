@@ -35,7 +35,6 @@
 package main
 
 import (
-	//"./editdist"
 	"./wordsort"
 	"fmt"
 	"bufio"
@@ -74,11 +73,12 @@ func main() {
 
 	// sorting words
 	fmt.Println("sorting words...")
-	words := wordsort.WordSort(dict)
+	words := wordsort.SortMap(dict)
 	
+	fmt.Println(words)
 
 
 	fmt.Println("doing thingy: ")
 
-	
+
 }
