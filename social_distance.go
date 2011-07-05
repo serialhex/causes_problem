@@ -35,9 +35,9 @@
 package main
 
 import (
-	"./wordsort"
 	"fmt"
 	"bufio"
+	"sync"
 	"os"
 )
 
@@ -60,7 +60,135 @@ func loadDict(fname string) ([]string, os.Error) {
 	return dict, err
 }
 
+// finds the edit distance between two strings
+func editDist(str1, str2 string) (min int) {
+	len1 := len(str1)
+	len2 := len(str2)
 
+	if len1 == 0 { return len2 }
+	if len2 == 0 { return len1 }
+
+	d := make([]int, len2+1)
+	for i := 0; i <= len2; i++ {
+		d[i] = i
+	}
+
+	for i := 0; i < len1; i++ {
+		e := i+1
+		for j := 0; j < len2; j++ {
+			cost := 0
+			if str1[i] != str2[j] { cost = 1 }
+			x := d[j+1] +1 		// insertion
+			y := e+1			// deletion
+			z := d[j] + cost	// substitution
+			if x < y {
+				if x < z {
+					min = x
+				} else {
+					min = z
+				}
+			} else if y < z {
+				min = y
+			} else {
+				min = z
+			}
+			d[j] = e
+			e = min
+		}
+		d[len2] = min
+	}
+	return
+}
+
+
+func sortMap(dict []string) (m map[int] map[byte] *wordSet) {
+// sorts a slice of strings into a map of lenths, beginning letters and the words themselves
+    var i, l int
+    var c byte
+    var ok bool
+
+    m = make(map[int] map[byte] *wordSet)
+    for i = range dict {
+        if l = len(dict[i]); l == 0 {
+            continue  // like next, only different spelling :P
+        }
+
+        if _, ok = m[l]; !ok {
+            m[l] = make(map[byte] *wordSet)
+        }
+
+        c = dict[i][0]
+        if _, ok = m[l][c]; !ok {
+            m[l][c] = newWordSet()
+        }
+        foo := m[l][c]
+        foo.addWord(dict[i])
+        m[l][c] = foo
+    }
+
+    return
+}
+
+// setting up uber wordset type
+// don't use this type directly...
+type wordSet struct {
+	set []string
+	mu sync.RWMutex
+}
+
+func (w *wordSet) addWord(str string) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	w.set = append(w.set, str)
+}
+
+func newWordSet() *wordSet {
+	return &wordSet{set: make([]string, 10000)}
+}
+
+// setting up our uber WordList type...
+type WordList struct {
+	words map[int] map[byte] *wordSet
+}
+
+func NewWordList(dict []string) *WordList {
+	//return WordList(words: make(map[int] map[byte] []string))
+	l := sortMap(dict)
+	return &WordList{words: l}
+}
+
+// gets the words that are closest to 'word'
+func (w *WordList) findNear(word string) (near []*wordSet) {
+	l := len(word)
+	ch := word[0]
+	for _, set := range w.words[l] {
+		near = append(near, set)
+	}
+	if tmp := w.words[l+1][ch]; tmp != nil {
+		near = append(near, tmp)
+	}
+	if tmp := w.words[l-1][ch]; tmp != nil {
+		near = append(near, tmp)
+	}
+	return
+}
+
+// finds the friends of a word
+func findFriends(word string, list []*wordSet) (friends []string) {
+	//list.mu.Lock()
+	//defer list.mu.Unlock()
+	for _, lwrds := range list {
+		lwrds.mu.Lock()
+		defer lwrds.mu.Unlock()
+		for i, lwrd := range lwrds.set {
+			if editDist(word, lwrd) == 1 {
+				friends = append(friends, lwrd)
+				lwrds.set[i] = ""
+			}
+		}
+	}
+	return
+}
 
 func main() {
 
@@ -73,9 +201,9 @@ func main() {
 
 	// sorting words
 	fmt.Println("sorting words...")
-	words := wordsort.SortMap(dict)
+	word_list := NewWordList(dict)
 	
-	fmt.Println(words)
+	fmt.Println(word_list)
 
 
 	fmt.Println("doing thingy: ")
