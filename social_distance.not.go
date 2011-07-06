@@ -99,87 +99,63 @@ func editDist(str1, str2 string) (min int) {
 }
 
 
-func sortMap(dict []string) (m map[int] map[byte] *wordSet) {
+func sortMap(dict []string) (m map[int] map[byte] []string) {
 // sorts a slice of strings into a map of lenths, beginning letters and the words themselves
     var i, l int
     var c byte
     var ok bool
 
-    m = make(map[int] map[byte] *wordSet)
+    m = make(map[int] map[byte] []string)
     for i = range dict {
         if l = len(dict[i]); l == 0 {
             continue  // like next, only different spelling :P
         }
 
         if _, ok = m[l]; !ok {
-            m[l] = make(map[byte] *wordSet)
+            m[l] = make(map[byte] []string)
         }
 
         c = dict[i][0]
-        if _, ok = m[l][c]; !ok {
-            m[l][c] = newWordSet()
-        }
-        foo := m[l][c]
-        foo.addWord(dict[i])
-        m[l][c] = foo
+      	m[l][c] = append(m[l][c], dict[i])
+        
     }
 
     return
 }
 
-
-// setting up uber wordset type
-// don't use this type directly...
-type wordSet struct {
-	set map[int] string
-}
-
-func (w *wordSet) addWord(str string) {
-	//w.set = append(w.set, str)
-	l := len(w.set)
-	for w.set[l] != "" {
-		l++
-	}
-	w.set[l] = str
-}
-
-func newWordSet() *wordSet {
-	return &wordSet{set: make(map[int] string, 10000)}
-}
-
 // setting up our uber WordList type...
 type WordList struct {
-	words map[int] map[byte] *wordSet
+	words map[int] map[byte] []string
 }
 
-func NewWordList(dict []string) WordList {
+func NewWordList(dict []string) *WordList {
 	l := sortMap(dict)
-	return WordList{words: l}
+	return &WordList{words: l}
 }
 
 // gets the words that are closest to 'word'
-func (w *WordList) findNear(word string) (near []*wordSet) {
+func (w *WordList) findNear(word string) (near []*[]string) {
 	l := len(word)
 	ch := word[0]
 	for _, set := range w.words[l] {
-		near = append(near, set)
+		near = append(near, &set)
 	}
 	if tmp := w.words[l+1][ch]; tmp != nil {
-		near = append(near, tmp)
+		near = append(near, &tmp)
 	}
 	if tmp := w.words[l-1][ch]; tmp != nil {
-		near = append(near, tmp)
+		near = append(near, &tmp)
 	}
 	return
 }
 
 // finds the friends of a word
-func findFriends(word string, list []*wordSet) (friends []string) {
+func findFriends(word string, list []*[]string) (friends []string) {
 	for _, lwrds := range list {
-		for i, lwrd := range lwrds.set {
+		for i, lwrd := range lwrds {
 			if editDist(word, lwrd) == 1 {
 				friends = append(friends, lwrd)
-				lwrds.set[i] = "", false
+				lwrds[i] = ""
 			}
 		}
 	}
@@ -187,24 +163,13 @@ func findFriends(word string, list []*wordSet) (friends []string) {
 }
 
 func uberFriendFindingFunction(input map[string] bool, list WordList) (output map[string] bool) {
-	
-	// making friends
-	output = make(map[string] bool)
+	output := make(map[string] bool)
 	friends := make([]string, 10)
-
-	num := 0
-
+	
 	for word, _ := range input {
-
-		// debugging stuff
-		fmt.Println(word, num)
-		num++
-
-		if len(word) == 0 {
+		if input[word] {
 			continue
 		}
-
-
 		nearby := list.findNear(word)
 		tmp := findFriends(word, nearby)
 		
@@ -213,22 +178,16 @@ func uberFriendFindingFunction(input map[string] bool, list WordList) (output ma
 		}
 	}
 
-	// adding the found to the output
 	for _, word := range friends {
 		output[word] = true
 	}
 
-	// doing the recursive thing
-	tmp := uberFriendFindingFunction(output, list)
-	for wrd, _ := range tmp {
-		output[wrd] = true
+	for _, word := range friends {
+		tmp := uberFriendFindingFunction(output, list)
+		for wrd, _ := range tmp {
+			output[wrd] = true
+		}
 	}
-
-	// adding input to output
-	for wrd, _ := range input {
-		output[wrd] = true
-	}
-	
 	return
 }
 
@@ -247,12 +206,11 @@ func main() {
 	word_list := NewWordList(dict)
 	
 	// keep friends list in here
-	fmt.Println("making friends...")
 	friends := make(map[string] bool, 500)
 	friends["causes"] = true
 
 	fmt.Println("doing thingy: ")
-	list := uberFriendFindingFunction(friends, word_list)
+	list := uberFriendFindingFunction(friends, wordlist)
 
 	fmt.Println(list)
 }
